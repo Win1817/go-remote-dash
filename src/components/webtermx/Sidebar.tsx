@@ -264,12 +264,13 @@ export function Sidebar() {
         </ul>
       </ScrollArea>
 
-      {/* Keyboard shortcuts hint */}
-      <div className="border-t border-sidebar-border px-3 py-2">
-        <div className="text-[10px] text-muted-foreground/70">
-          <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[9px]">Ctrl+F</kbd> search ·{" "}
-          <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[9px]">Ctrl+Shift+C</kbd> copy
-        </div>
+      {/* Status footer */}
+      <div className="border-t border-sidebar-border px-3 py-2 text-[10px] text-muted-foreground/60">
+        {settings.demoMode
+          ? "🟢 Demo mode — simulated shell, no real SSH"
+          : settings.gatewayUrl
+          ? `⚡ Gateway: ${settings.gatewayUrl.replace("wss://", "").split("/")[0]}`
+          : "⚠️ No gateway configured — real connections will fail"}
       </div>
 
       <ServerDialog

@@ -37,6 +37,39 @@ export function createWebSocketTransport(opts: {
   const listeners = new Set<(e: TransportEvent) => void>();
   const emit = (e: TransportEvent) => listeners.forEach((l) => l(e));
 
+  // Guard: if no URL was provided, show a helpful message instead of crashing
+  if (!opts.url || !opts.url.startsWith("ws")) {
+    setTimeout(() => {
+      emit({
+        type: "data",
+        data:
+          "\x1b[1;31m╔══════════════════════════════════════════════╗\x1b[0m\r\n" +
+          "\x1b[1;31m║         No SSH Gateway Configured            ║\x1b[0m\r\n" +
+          "\x1b[1;31m╚══════════════════════════════════════════════╝\x1b[0m\r\n\r\n" +
+          "\x1b[33mThis is a frontend-only SPA — real SSH connections\x1b[0m\r\n" +
+          "\x1b[33mrequire a WebSocket SSH gateway server.\x1b[0m\r\n\r\n" +
+          "\x1b[1mTo connect to real servers:\x1b[0m\r\n" +
+          "  1. Deploy a WebSocket SSH proxy:\r\n" +
+          "     \x1b[36mhttps://github.com/butlerx/wetty\x1b[0m\r\n" +
+          "     \x1b[36mhttps://github.com/huashengdun/webssh\x1b[0m\r\n" +
+          "  2. Open \x1b[1mSettings\x1b[0m (gear icon in sidebar)\r\n" +
+          "  3. Paste your gateway WSS URL\r\n\r\n" +
+          "\x1b[90mOr enable Demo Mode in Settings to explore with a\x1b[0m\r\n" +
+          "\x1b[90msimulated shell — no backend needed.\x1b[0m\r\n",
+      });
+      emit({ type: "status", status: "error", message: "No gateway URL configured" });
+    }, 200);
+    return {
+      send() {},
+      resize() {},
+      close() {},
+      onEvent(cb) {
+        listeners.add(cb);
+        return () => listeners.delete(cb);
+      },
+    };
+  }
+
   emit({ type: "status", status: "connecting" });
 
   let ws: WebSocket;

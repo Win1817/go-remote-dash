@@ -30,11 +30,20 @@ export function SettingsDialog({ open, onOpenChange }: Props) {
           <div className="space-y-3">
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Connection</p>
 
+            {/* No-backend notice */}
+            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-300">
+              <p className="font-medium">Frontend-only — no backend yet</p>
+              <p className="mt-1 text-amber-300/80">
+                This is a static SPA demo. Real SSH connections require a WebSocket gateway server.
+                Demo mode lets you explore the UI with a simulated shell.
+              </p>
+            </div>
+
             <div className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2.5">
               <div>
                 <div className="text-sm font-medium">Demo mode</div>
                 <div className="text-xs text-muted-foreground">
-                  Use a fake in-browser shell instead of a real SSH gateway.
+                  Simulated in-browser shell — no real SSH needed.
                 </div>
               </div>
               <Switch
@@ -44,22 +53,30 @@ export function SettingsDialog({ open, onOpenChange }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="gw">SSH gateway WebSocket URL</Label>
+              <Label htmlFor="gw" className={settings.demoMode ? "text-muted-foreground/50" : ""}>
+                SSH gateway WebSocket URL
+              </Label>
               <Input
                 id="gw"
-                placeholder="wss://ssh-gateway.example.com/ws"
+                placeholder="wss://your-gateway.example.com/ws"
                 value={settings.gatewayUrl}
                 onChange={(e) => updateSettings({ gatewayUrl: e.target.value })}
                 disabled={settings.demoMode}
               />
-              <p className="text-[11px] text-muted-foreground">
-                Frames:{" "}
-                <code className="font-mono">connect</code>,{" "}
-                <code className="font-mono">data</code>,{" "}
-                <code className="font-mono">resize</code>,{" "}
-                <code className="font-mono">close</code>. See{" "}
-                <code className="font-mono">src/lib/webtermx/transport.ts</code> for the full protocol.
-              </p>
+              {settings.demoMode ? (
+                <p className="text-[11px] text-muted-foreground/60">
+                  Disable demo mode to configure a real gateway.
+                </p>
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  Deploy a WebSocket SSH proxy (e.g.{" "}
+                  <a href="https://github.com/butlerx/wetty" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">wetty</a>
+                  {" "}or{" "}
+                  <a href="https://github.com/huashengdun/webssh" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">webssh</a>
+                  ) and paste its URL above. See{" "}
+                  <code className="font-mono">src/lib/webtermx/transport.ts</code> for the wire protocol.
+                </p>
+              )}
             </div>
           </div>
 

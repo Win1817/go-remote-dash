@@ -225,7 +225,7 @@ export function WorkspacePanel() {
 }
 
 function EmptyState() {
-  const { servers, openSession } = useWebTermX();
+  const { servers, openSession, settings } = useWebTermX();
   const recentServer = [...servers].sort((a, b) => (b.lastConnectedAt ?? 0) - (a.lastConnectedAt ?? 0))[0];
 
   return (
@@ -234,28 +234,44 @@ function EmptyState() {
         <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary">
           <TerminalSquare className="h-6 w-6" />
         </div>
-        <h2 className="text-base font-semibold">Welcome to WebTermX</h2>
+        <h2 className="text-base font-semibold">WebTermX</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Pick a server in the sidebar and click{" "}
-          <span className="text-foreground">Connect</span> to open a terminal tab.
+          <span className="text-foreground">Connect</span> to open a terminal.
         </p>
+
+        {/* No-backend notice */}
+        {settings.demoMode && (
+          <div className="mt-4 rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-left text-xs text-amber-300/90">
+            <p className="font-medium">Running in demo mode</p>
+            <p className="mt-0.5 text-amber-300/70">
+              Terminals use a simulated shell — no real SSH. Add a gateway in Settings to connect to real servers.
+            </p>
+          </div>
+        )}
+        {!settings.demoMode && !settings.gatewayUrl && (
+          <div className="mt-4 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-left text-xs text-red-300/90">
+            <p className="font-medium">No gateway configured</p>
+            <p className="mt-0.5 text-red-300/70">
+              Go to Settings and either enable demo mode or set a WebSocket gateway URL.
+            </p>
+          </div>
+        )}
+
         {recentServer && (
           <button
             className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary/10 px-3 py-1.5 text-xs text-primary transition-colors hover:bg-primary/20"
             onClick={() => openSession(recentServer.id)}
           >
             <TerminalSquare className="h-3.5 w-3.5" />
-            Reconnect to {recentServer.name}
+            Open {recentServer.name}
           </button>
         )}
-        <p className="mt-4 text-[11px] text-muted-foreground">
-          Demo mode is on by default — switch it off in{" "}
-          <span className="text-foreground">Settings</span> to use your real SSH gateway.
-        </p>
-        <div className="mt-4 flex justify-center gap-4 text-[10px] text-muted-foreground/70">
+
+        <div className="mt-4 flex justify-center gap-4 text-[10px] text-muted-foreground/60">
           <span><kbd className="rounded bg-muted px-1 font-mono">Ctrl+F</kbd> search</span>
-          <span><kbd className="rounded bg-muted px-1 font-mono">Ctrl+Shift+C</kbd> copy</span>
           <span><kbd className="rounded bg-muted px-1 font-mono">↑↓</kbd> history</span>
+          <span><kbd className="rounded bg-muted px-1 font-mono">Tab</kbd> complete</span>
         </div>
       </div>
     </div>
