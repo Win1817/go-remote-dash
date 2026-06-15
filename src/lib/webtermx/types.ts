@@ -14,7 +14,9 @@ export interface ServerProfile {
   privateKey?: string;
   passphrase?: string;
   color?: string;
+  tags?: string[];
   createdAt: number;
+  lastConnectedAt?: number;
 }
 
 export type ConnectionStatus = "idle" | "connecting" | "connected" | "closed" | "error";
@@ -25,6 +27,7 @@ export interface TerminalSession {
   title: string;
   status: ConnectionStatus;
   createdAt: number;
+  connectedAt?: number;
 }
 
 export interface AppSettings {
@@ -32,6 +35,8 @@ export interface AppSettings {
   demoMode: boolean;
   fontSize: number;
   theme: "dracula" | "solarized" | "monokai" | "default";
+  scrollback: number;
+  bellEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -39,4 +44,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   demoMode: true,
   fontSize: 14,
   theme: "default",
+  scrollback: 5000,
+  bellEnabled: false,
 };

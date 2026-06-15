@@ -16,6 +16,7 @@ interface WebTermXState {
   closeSession: (sessionId: string) => void;
   setActiveSession: (sessionId: string) => void;
   updateSessionStatus: (sessionId: string, status: TerminalSession["status"]) => void;
+  reconnectSession: (sessionId: string) => void;
 
   updateSettings: (patch: Partial<AppSettings>) => void;
 }
@@ -43,6 +44,7 @@ export function WebTermXProvider({ children }: { children: ReactNode }) {
         authType: "password",
         password: "",
         color: "#3ddc97",
+        tags: ["demo"],
         createdAt: Date.now(),
       };
       setServers([demo]);
@@ -78,6 +80,10 @@ export function WebTermXProvider({ children }: { children: ReactNode }) {
       };
       setSessions((prev) => [...prev, sess]);
       setActiveSessionId(sess.id);
+      // Track last connected time on the server profile
+      setServers((prev) =>
+        prev.map((s) => (s.id === serverId ? { ...s, lastConnectedAt: Date.now() } : s)),
+      );
     },
     [servers],
   );
@@ -93,9 +99,26 @@ export function WebTermXProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const reconnectSession = useCallback(
+    (sessionId: string) => {
+      const session = sessions.find((s) => s.id === sessionId);
+      if (!session) return;
+      // Close the old session and open a fresh one for the same server
+      closeSession(sessionId);
+      setTimeout(() => openSession(session.serverId), 50);
+    },
+    [sessions, closeSession, openSession],
+  );
+
   const updateSessionStatus = useCallback(
     (sessionId: string, status: TerminalSession["status"]) => {
-      setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, status } : s)));
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId
+            ? { ...s, status, connectedAt: status === "connected" ? Date.now() : s.connectedAt }
+            : s,
+        ),
+      );
     },
     [],
   );
@@ -115,6 +138,7 @@ export function WebTermXProvider({ children }: { children: ReactNode }) {
       deleteServer,
       openSession,
       closeSession,
+      reconnectSession,
       setActiveSession: setActiveSessionId,
       updateSessionStatus,
       updateSettings,
@@ -129,6 +153,7 @@ export function WebTermXProvider({ children }: { children: ReactNode }) {
       deleteServer,
       openSession,
       closeSession,
+      reconnectSession,
       updateSessionStatus,
       updateSettings,
     ],
