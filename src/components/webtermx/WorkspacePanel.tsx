@@ -1,5 +1,5 @@
 import { X, Plus, Folder, TerminalSquare, Copy, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -30,11 +30,10 @@ const STATUS_COLOR: Record<ConnectionStatus, string> = {
 
 function UptimeDisplay({ connectedAt }: { connectedAt?: number }) {
   const [, forceRender] = useState(0);
-  // Rerender every second while visible
-  useState(() => {
+  useEffect(() => {
     const id = setInterval(() => forceRender((n) => n + 1), 1000);
     return () => clearInterval(id);
-  });
+  }, []);
   if (!connectedAt) return null;
   const secs = Math.floor((Date.now() - connectedAt) / 1000);
   const h = Math.floor(secs / 3600);
