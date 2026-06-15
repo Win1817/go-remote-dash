@@ -210,7 +210,6 @@ export function TerminalPane({ session, active }: Props) {
       <div
         ref={containerRef}
         className="h-full w-full flex-1 bg-terminal"
-        style={{ display: active ? "block" : "none" }}
       />
 
       {/* Reconnect overlay — shown when connection closed/errored */}

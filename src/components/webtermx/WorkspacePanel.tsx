@@ -194,11 +194,18 @@ export function WorkspacePanel() {
               </div>
 
               <div className="relative min-h-0 flex-1">
-                {sessions.map((s) => (
-                  <div key={s.id} className="absolute inset-0">
-                    <TerminalPane session={s} active={s.id === activeSessionId} />
-                  </div>
-                ))}
+                {sessions.map((s) => {
+                  const isActive = s.id === activeSessionId;
+                  return (
+                    <div
+                      key={s.id}
+                      className="absolute inset-0"
+                      style={{ display: isActive ? "block" : "none" }}
+                    >
+                      <TerminalPane session={s} active={isActive} />
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}
